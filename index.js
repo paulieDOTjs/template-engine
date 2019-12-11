@@ -1,5 +1,10 @@
 const inquirer = require("inquirer");
 
+const employee = require("./classes/employee")
+const engineer = require("./classes/engineer")
+const intern = require("./classes/intern")
+const manager = require("./classes/manager")
+
 let teamName;
 let numberOfMembers;
 
@@ -22,8 +27,6 @@ function firstPrompt() {
             }
         })
 }
-
-
 
 function doubleCheck() {
     inquirer.prompt(
