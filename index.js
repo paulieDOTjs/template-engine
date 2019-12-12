@@ -1,13 +1,15 @@
 const inquirer = require("inquirer");
+const fs = require("fs");
 
-const employee = require("./lib/employee")
-const engineer = require("./lib/engineer")
-const intern = require("./lib/intern")
-const manager = require("./lib/manager")
+const Employee = require("./lib/employee")
+const Engineer = require("./lib/engineer")
+const Intern = require("./lib/intern")
+const Manager = require("./lib/manager")
+
 const teamMembers = [];
 
 let teamName;
-let numberOfMembers;
+let numberOfMembersGiven;
 
 function firstPrompt() {
 
@@ -48,7 +50,6 @@ function doubleCheck() {
         })
 }
 
-
 function askAboutTeam() {
     inquirer.prompt([
         {
@@ -60,64 +61,178 @@ function askAboutTeam() {
             type: "list",
             message: "How many people are on your team?",
             choices: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-            name: "numberOfMembers"
+            name: "numberOfMembersGiven"
         }
     ])
         .then(function (response) {
             teamName = response.teamName;
-            numberOfMembers = response.numberOfMembers;
+            numberOfMembersGiven = response.numberOfMembersGiven;
             askAboutTeamMembers();
         })
 }
 
 function askAboutTeamMembers() {
-    let i = 0;
-    function loopy() {
-        inquirer.prompt([
-            {
-                type: "input",
-                message: `What is the name of team member ${i + 1}?`,
-                name: "employeeName"
-            },
-            {
-                type: "input",
-                message: `What is their ID number?`,
-                name: "employeeId"
-            },
-            {
-                type: "input",
-                message: `What is their email address?`,
-                name: "employeeEmail"
-            },
-            {
-                type: "list",
-                message: "What is their role?",
-                choices: ['Engineer', 'Intern', 'Manager'],
-                name: "employeeRole"
+    inquirer.prompt([
+        {
+            type: "input",
+            message: `What is the name of team member ${teamMembers.length + 1}?`,
+            name: "employeeName"
+        },
+        {
+            type: "list",
+            message: "What is their role?",
+            choices: ['Engineer', 'Intern', 'Manager'],
+            name: "employeeRole"
+        },
+        {
+            type: "input",
+            message: `What is their ID number?`,
+            name: "employeeId"
+        },
+        {
+            type: "input",
+            message: `What is their email address?`,
+            name: "employeeEmail"
+        }
+    ])
+        .then(function (response) {
+            switch (response.employeeRole) {
+                case 'Engineer':
+                    makeEngineer(response)
+                    break;
+                case 'Intern':
+                    makeIntern(response)
+                    break;
+                case 'Manager':
+                    makeManager(response)
+                    break;
             }
-        ])
-            .then(function (response) {
-                switch (response.employeeRole) {
-                    case 'Engineer':
-                        console.log('Engineer')
-                        break;
-                    case 'Intern':
-                        console.log('Intern')
-                        break;
-                    case 'Manager':
-                        console.log('Manager')
-                        break;
-                }
-                if (i < numberOfMembers) {
-                    i += 1;
-                    console.log(i)
-                    loopy();
-                } else {
-                    sayGoodbye();
-                }
-            })
+        })
+}
+
+function checkIfDone() {
+    if (teamMembers.length < numberOfMembersGiven) {
+        askAboutTeamMembers();
+    } else {
+        writeTopHTML();
     }
-    loopy();
+}
+
+function makeEngineer(response) {
+    let engineer = new Engineer(response.id, response.email, response.name);
+    inquirer.prompt(
+        {
+            type: "input",
+            message: "What is their GitHub username?",
+            name: "github"
+        }
+    )
+        .then(function (response) {
+            engineer.github = response.github
+            teamMembers.push(engineer);
+            checkIfDone()
+        })
+}
+
+function makeIntern(response) {
+    let intern = new Intern(response.id, response.email, response.name);
+    inquirer.prompt(
+        {
+            type: "input",
+            message: "What is the name of their school?",
+            name: "school"
+        }
+    )
+        .then(function (response) {
+            intern.school = response.school
+            teamMembers.push(intern);
+            checkIfDone()
+        })
+}
+
+function makeManager(response) {
+    let manager = new Manager(response.id, response.email, response.name);
+    inquirer.prompt(
+        {
+            type: "input",
+            message: "What is their office number?",
+            name: "officeNumber"
+        }
+    )
+        .then(function (response) {
+            manager.officeNumber = response.officeNumber
+            teamMembers.push(manager);
+            checkIfDone()
+        })
+}
+
+function writeTopHTML() {
+    fs.writeFile(`./html/${teamName}.html`, `<!DOCTYPE html>
+        <html lang="en">
+        
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta http-equiv="X-UA-Compatible" content="ie=edge">
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+                integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+            <link rel="stylesheet" href="../css/style.css">
+            <title>Document</title>
+        </head>
+        
+        <body>
+            <header>
+                <h1 class='d-flex justify-content-center'>
+                    MY TEAM
+                </h1>
+            </header>
+        
+            <div class="container">
+                <div class="row">
+                    `, function (err) {
+
+        if (err) {
+            return console.log(err);
+        }
+
+        console.log("Success on top part!");
+        writeMiddleHTML()
+    });
+}
+
+writeMiddleHTML(){
+    for (let i = 0; teamMembers.length < numberOfMembersGiven) {
+        fs.appendFile('message.txt', ` 
+        <div class="col-3 card">
+        <div class="row">
+            <div class="col card-top">
+                <h2>
+                    ${teamMembers[i].name}
+                    </h2>
+                <h3>
+                ${teamMembers[i].role}
+                    </h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col card-bottom">
+                <h4>
+                ${teamMembers[i].id}
+                    </h4>
+                <h4>
+                ${teamMembers[i].email} 
+                    </h4>
+                <h4>
+                    Office number: 1
+                    </h4>
+            </div>
+        </div>
+    </div>`, (err) => {
+            if (err) throw err;
+            console.log('The "data to append" was appended to file!');
+        });
+
+    }
 }
 
 function sayGoodbye() {
