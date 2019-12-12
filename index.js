@@ -1,9 +1,10 @@
 const inquirer = require("inquirer");
 
-const employee = require("./classes/employee")
-const engineer = require("./classes/engineer")
-const intern = require("./classes/intern")
-const manager = require("./classes/manager")
+const employee = require("./lib/employee")
+const engineer = require("./lib/engineer")
+const intern = require("./lib/intern")
+const manager = require("./lib/manager")
+const teamMembers = [];
 
 let teamName;
 let numberOfMembers;
@@ -48,8 +49,6 @@ function doubleCheck() {
 }
 
 
-
-
 function askAboutTeam() {
     inquirer.prompt([
         {
@@ -67,7 +66,58 @@ function askAboutTeam() {
         .then(function (response) {
             teamName = response.teamName;
             numberOfMembers = response.numberOfMembers;
+            askAboutTeamMembers();
         })
+}
+
+function askAboutTeamMembers() {
+    let i = 0;
+    function loopy() {
+        inquirer.prompt([
+            {
+                type: "input",
+                message: `What is the name of team member ${i + 1}?`,
+                name: "employeeName"
+            },
+            {
+                type: "input",
+                message: `What is their ID number?`,
+                name: "employeeId"
+            },
+            {
+                type: "input",
+                message: `What is their email address?`,
+                name: "employeeEmail"
+            },
+            {
+                type: "list",
+                message: "What is their role?",
+                choices: ['Engineer', 'Intern', 'Manager'],
+                name: "employeeRole"
+            }
+        ])
+            .then(function (response) {
+                switch (response.employeeRole) {
+                    case 'Engineer':
+                        console.log('Engineer')
+                        break;
+                    case 'Intern':
+                        console.log('Intern')
+                        break;
+                    case 'Manager':
+                        console.log('Manager')
+                        break;
+                }
+                if (i < numberOfMembers) {
+                    i += 1;
+                    console.log(i)
+                    loopy();
+                } else {
+                    sayGoodbye();
+                }
+            })
+    }
+    loopy();
 }
 
 function sayGoodbye() {
