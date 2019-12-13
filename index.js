@@ -5,6 +5,7 @@ const Employee = require("./lib/employee")
 const Engineer = require("./lib/engineer")
 const Intern = require("./lib/intern")
 const Manager = require("./lib/manager")
+const layout = require("./layout")
 
 const teamMembers = [];
 
@@ -60,7 +61,7 @@ function askAboutTeam() {
         {
             type: "list",
             message: "How many people are on your team?",
-            choices: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            choices: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
             name: "numberOfMembersGiven"
         }
     ])
@@ -72,39 +73,46 @@ function askAboutTeam() {
 }
 
 function askAboutTeamMembers() {
+    const employee = {};
     inquirer.prompt([
         {
             type: "input",
             message: `What is the name of team member ${teamMembers.length + 1}?`,
-            name: "employeeName"
+            name: "name"
         },
         {
             type: "list",
             message: "What is their role?",
             choices: ['Engineer', 'Intern', 'Manager'],
-            name: "employeeRole"
+            name: "role"
         },
         {
             type: "input",
             message: `What is their ID number?`,
-            name: "employeeId"
+            name: "id"
         },
         {
             type: "input",
             message: `What is their email address?`,
-            name: "employeeEmail"
+            name: "email"
         }
     ])
+
+
         .then(function (response) {
-            switch (response.employeeRole) {
+            employee.name = response.name;
+            employee.id = response.id;
+            employee.email = response.email;
+
+            switch (response.role) {
                 case 'Engineer':
-                    makeEngineer(response)
+                    makeEngineer(employee)
                     break;
                 case 'Intern':
-                    makeIntern(response)
+                    makeIntern(employee)
                     break;
                 case 'Manager':
-                    makeManager(response)
+                    makeManager(employee)
                     break;
             }
         })
@@ -118,8 +126,7 @@ function checkIfDone() {
     }
 }
 
-function makeEngineer(response) {
-    let engineer = new Engineer(response.id, response.email, response.name);
+function makeEngineer(employee) {
     inquirer.prompt(
         {
             type: "input",
@@ -128,14 +135,13 @@ function makeEngineer(response) {
         }
     )
         .then(function (response) {
-            engineer.github = response.github
-            teamMembers.push(engineer);
+            employee.special = `GitHub: ${response.github}`;
+            teamMembers.push(employee);
             checkIfDone()
         })
 }
 
-function makeIntern(response) {
-    let intern = new Intern(response.id, response.email, response.name);
+function makeIntern(employee) {
     inquirer.prompt(
         {
             type: "input",
@@ -144,14 +150,13 @@ function makeIntern(response) {
         }
     )
         .then(function (response) {
-            intern.school = response.school
-            teamMembers.push(intern);
+            employee.special = `School: ${response.school}`
+            teamMembers.push(employee);
             checkIfDone()
         })
 }
 
-function makeManager(response) {
-    let manager = new Manager(response.id, response.email, response.name);
+function makeManager(employee) {
     inquirer.prompt(
         {
             type: "input",
@@ -160,13 +165,14 @@ function makeManager(response) {
         }
     )
         .then(function (response) {
-            manager.officeNumber = response.officeNumber
-            teamMembers.push(manager);
+            employee.special = `Office #: ${response.officeNumber}`
+            teamMembers.push(employee);
             checkIfDone()
         })
 }
 
 function writeTopHTML() {
+
     fs.writeFile(`./html/${teamName}.html`, `<!DOCTYPE html>
         <html lang="en">
         
@@ -200,39 +206,104 @@ function writeTopHTML() {
     });
 }
 
-writeMiddleHTML(){
-    for (let i = 0; teamMembers.length < numberOfMembersGiven) {
-        fs.appendFile('message.txt', ` 
-        <div class="col-3 card">
+function writeMiddleHTML() {
+    let numberOfRows = layout.getNumberofRows(numberOfMembersGiven);
+    let rowsMade = 0;
+    let numberOfCards = layout.getRowOne(numberOfMembersGiven);
+    let cardsMade = 0;
+
+    function checkForCards() {
+        console.log(numberOfCards);
+        console.log(cardsMade);
+        if (cardsMade < numberOfCards) {
+            makeCard()
+        } else {
+            checkForRows()
+        }
+    }
+    function checkForRows() {
+        console.log(numberOfRows);
+        console.log(rowsMade);
+        if (numberOfRows === rowsMade) {
+            writeEndHTML()
+        } else {
+            makeExtraRow()
+        }
+    }
+
+    function makeExtraRow() {
+        rowsMade += 1;
+        cardsMade = 0;
+        switch (rowsMade) {
+            case 1:
+                numberOfCards = layout.getRowTwo(numberOfMembersGiven);
+                break;
+            case 2:
+                numberOfCards = layout.getRowThree(numberOfMembersGiven);
+                break;
+            case 3:
+                numberOfCards = layout.getRowFour(numberOfMembersGiven);
+                break;
+        }
+        fs.appendFile(`./html/${teamName}.html`, ` 
+        </div><div class="row">
+        `
+            , (err) => {
+                if (err) throw err;
+                console.log('The "data to append" was appended to file!');
+                checkForCards();
+            });
+    }
+
+    function makeCard() {
+        cardsMade += 1;
+        fs.appendFile(`./html/${teamName}.html`, `
+         <div class="col card">
         <div class="row">
             <div class="col card-top">
                 <h2>
-                    ${teamMembers[i].name}
-                    </h2>
+                    Name: ${teamMembers[0].name}
+                </h2>
                 <h3>
-                ${teamMembers[i].role}
-                    </h3>
+                    Role: ${teamMembers[0].role}
+                </h3>
             </div>
         </div>
         <div class="row">
             <div class="col card-bottom">
                 <h4>
-                ${teamMembers[i].id}
-                    </h4>
+                ID: ${teamMembers[0].ID}
+                </h4>
                 <h4>
-                ${teamMembers[i].email} 
-                    </h4>
+                Email: ${teamMembers[0].email}           
+                 </h4>
                 <h4>
-                    Office number: 1
-                    </h4>
+                ${teamMembers[0].special}
+                </h4>
             </div>
         </div>
-    </div>`, (err) => {
+    </div>
+        `, (err) => {
             if (err) throw err;
             console.log('The "data to append" was appended to file!');
+            checkForCards();
         });
-
     }
+
+    checkForCards()
+}
+
+
+function writeEndHTML() {
+    fs.appendFile(`./html/${teamName}.html`, ` 
+    </div>
+    </div>
+</body>
+`, (err) => {
+        if (err) throw err;
+        console.log('The "data to append" was appended to file!');
+    });
+
 }
 
 function sayGoodbye() {

@@ -10,10 +10,17 @@ body {
     background-size: cover;
 }
 
+.row{
+    background-color: none;
+}
+
 .card {
     margin-top: 24px;
     border: none;
     border-radius: 10px;
+    margin-left: 12px;
+    margin-right: 12px;
+    height: 291;
 }
 
 .card-top {
