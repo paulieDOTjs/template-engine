@@ -6,6 +6,6 @@ Demonstration of the app working can be found here:
 
 Images of two different layouts can be seen here:
 
-![5 card layout](https://github.com/paulrobhendrickson/template-engine/blob/master/images/Screen%20Shot%202019-12-12%20at%2011.18.14%20PM.png?raw=true)
+![5 card layout](https://github.com/paulrobhendrickson/template-engine/blob/master/images/Screen%20Shot%202019-12-12%20at%2011.21.18%20PM.png?raw=true)
 
-![13 card layout](https://github.com/paulrobhendrickson/template-engine/blob/master/images/Screen%20Shot%202019-12-12%20at%2011.18.17%20PM.png?raw=true)
+![13 card layout](https://github.com/paulrobhendrickson/template-engine/blob/master/images/Screen%20Shot%202019-12-12%20at%2011.21.25%20PM.png?raw=true)
