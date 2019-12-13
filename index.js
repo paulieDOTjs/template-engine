@@ -61,7 +61,7 @@ function askAboutTeam() {
         {
             type: "list",
             message: "How many people are on your team?",
-            choices: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+            choices: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
             name: "numberOfMembersGiven"
         }
     ])
@@ -127,6 +127,7 @@ function checkIfDone() {
 }
 
 function makeEngineer(employee) {
+    employee.role = 'Engineer'
     inquirer.prompt(
         {
             type: "input",
@@ -142,6 +143,7 @@ function makeEngineer(employee) {
 }
 
 function makeIntern(employee) {
+    employee.role = 'Intern'
     inquirer.prompt(
         {
             type: "input",
@@ -157,6 +159,7 @@ function makeIntern(employee) {
 }
 
 function makeManager(employee) {
+    employee.role = 'Manager'
     inquirer.prompt(
         {
             type: "input",
@@ -200,21 +203,18 @@ function writeTopHTML() {
         if (err) {
             return console.log(err);
         }
-
-        console.log("Success on top part!");
         writeMiddleHTML()
     });
 }
 
 function writeMiddleHTML() {
+    let i = 0;
     let numberOfRows = layout.getNumberofRows(numberOfMembersGiven);
-    let rowsMade = 0;
+    let rowsMade = 0
     let numberOfCards = layout.getRowOne(numberOfMembersGiven);
     let cardsMade = 0;
 
     function checkForCards() {
-        console.log(numberOfCards);
-        console.log(cardsMade);
         if (cardsMade < numberOfCards) {
             makeCard()
         } else {
@@ -222,12 +222,10 @@ function writeMiddleHTML() {
         }
     }
     function checkForRows() {
-        console.log(numberOfRows);
-        console.log(rowsMade);
-        if (numberOfRows === rowsMade) {
-            writeEndHTML()
-        } else {
+        if (rowsMade < numberOfRows) {
             makeExtraRow()
+        } else {
+            writeEndHTML()
         }
     }
 
@@ -250,7 +248,6 @@ function writeMiddleHTML() {
         `
             , (err) => {
                 if (err) throw err;
-                console.log('The "data to append" was appended to file!');
                 checkForCards();
             });
     }
@@ -262,30 +259,30 @@ function writeMiddleHTML() {
         <div class="row">
             <div class="col card-top">
                 <h2>
-                    Name: ${teamMembers[0].name}
+                    Name: ${teamMembers[i].name}
                 </h2>
                 <h3>
-                    Role: ${teamMembers[0].role}
+                    Role: ${teamMembers[i].role}
                 </h3>
             </div>
         </div>
         <div class="row">
             <div class="col card-bottom">
                 <h4>
-                ID: ${teamMembers[0].ID}
+                ID: ${teamMembers[i].id}
                 </h4>
                 <h4>
-                Email: ${teamMembers[0].email}           
+                Email: ${teamMembers[i].email}           
                  </h4>
                 <h4>
-                ${teamMembers[0].special}
+                ${teamMembers[i].special}
                 </h4>
             </div>
         </div>
     </div>
         `, (err) => {
             if (err) throw err;
-            console.log('The "data to append" was appended to file!');
+            i += 1;
             checkForCards();
         });
     }
@@ -301,13 +298,12 @@ function writeEndHTML() {
 </body>
 `, (err) => {
         if (err) throw err;
-        console.log('The "data to append" was appended to file!');
     });
-
+    sayGoodbye();
 }
 
 function sayGoodbye() {
-    console.log('Okay. Goodbye.')
+    console.log('Okay. My work here is done! Goodbye.')
     return;
 }
 

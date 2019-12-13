@@ -15,12 +15,9 @@ body {
 }
 
 .card {
-    margin-top: 24px;
     border: none;
     border-radius: 10px;
-    margin-left: 12px;
-    margin-right: 12px;
-    height: 291;
+    margin: 12px;
 }
 
 .card-top {
